@@ -1,0 +1,24 @@
+image:
+  name: andymeneely/swen331fuzzer # don't change this
+  entrypoint: [""]  # don't change this
+before_script:
+  # don't change these either
+  - chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
+  - echo '[+] Starting mysql...'
+  - service mysql start
+  - echo '[+] Starting apache'
+  - service apache2 start
+  - pip3 install mechanicalsoup
+fuzzrunner:
+  script:
+    # here is where you can write your commands to run your fuzzer or any custom setup commands
+    - echo "hello class"
+    # need some example files for vectors and words? These are on the image
+    - cat /words.txt
+    - cat /vectors.txt
+    - cat /badchars.txt
+    # An example fuzzer command. Note the url is DIFFERENT than XAMPP example (no /dvwa).
+    # Remove whatever you need to.
+    - python3 fuzzer.py discover http://localhost/ --custom-auth=dvwa --common-words=mywords.txt --extensions=myextension.txt
+    - python3 fuzzer.py test http://127.0.0.1/fuzzer-tests --custom-auth=dvwa --common-words=mywords.txt --extensions=myextension.txt --slow=1 --sanitized-chars=chars.txt --vectors=vectors.txt --sensitive=sensitive.txt
+  stage: test
